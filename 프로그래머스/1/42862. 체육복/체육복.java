@@ -2,43 +2,41 @@ import java.util.*;
 
 class Solution {
     public int solution(int n, int[] lost, int[] reserve) {
-        
         Arrays.sort(lost);
         Arrays.sort(reserve);
         
-        // 최소 수업 가능한 학생수 = 전체 - 도난당한 학생 수
-        int student = n - lost.length;
+        int[] students = new int[n];
+        Arrays.fill(students, 1); // 모든 학생은 기본적으로 1개의 체육복을 가지고 있음
         
-        // 도난당했지만 여벌 체육복이 있는 학생을 제외
-        for(int i = 0; i < lost.length; i++){
-            for(int j = 0; j < reserve.length; j++){
-                
-                if(lost[i] == reserve[j]){  // 있다면 해당 학생 번호는 예외처리
-                    lost[i] = -1;
-                    reserve[j] = -1;
-                    student++;
+        // 잃어버린 학생 처리
+        for (int l : lost) {
+            students[l - 1]--;
+        }
+        
+        // 여벌 체육복을 가진 학생 처리
+        for (int r : reserve) {
+            students[r - 1]++;
+        }
+        
+        // 빌려주기 시뮬레이션
+        for (int i = 0; i < n; i++) {
+            if (students[i] == 0) { // 체육복이 없는 학생
+                if (i > 0 && students[i - 1] == 2) { // 앞 번호 학생이 여벌이 있으면 빌려줌
+                    students[i]++;
+                    students[i - 1]--;
+                } else if (i < n - 1 && students[i + 1] == 2) { // 뒷 번호 학생이 여벌이 있으면 빌려줌
+                    students[i]++;
+                    students[i + 1]--;
                 }
             }
         }
         
-        // 여벌옷이 없는 학생 확인
-         for(int i = 0; i < lost.length; i++){
-             
-            if(lost[i] == -1) continue;
-             
-            for(int j = 0; j < reserve.length; j++){
-            
-                if(reserve[j] == -1) continue;
-                
-                if(lost[i] - reserve[j] == 1 || lost[i] - reserve[j] == -1){
-                    lost[i] = -1;
-                    reserve[j] = -1;
-                    student++;
-                }
-                    
-            }
-         }
-                
-        return student;
+        // 체육복을 가진 학생 수 카운팅
+        int answer = 0;
+        for (int s : students) {
+            if (s >= 1) answer++;
+        }
+        
+        return answer;
     }
 }
