@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,32 +12,25 @@ public class Main {
     String str = br.readLine();
 
     int answer = 0;
-    int startIdx = 0;
+    int tempPn = 0;
 
-    while(startIdx + (Pn * 2) < length) {
-
-      if(str.charAt(startIdx) == 'I') {
-
-        int tempPn = 0;
-        int tempIdx = startIdx;
-        while(tempPn < Pn) {
-
-          if(str.charAt(tempIdx + 1) == 'O' && str.charAt(tempIdx + 2) == 'I') {
-            tempPn++;
-            tempIdx = tempIdx + 2;
-          } else {
-            break;
-          }
-        }
-
+    for(int i = 0; i < length - 2; i++) {
+      
+      if(str.charAt(i) == 'I' && (str.charAt(i + 1) == 'O' && str.charAt(i + 2) == 'I')) {
+        tempPn++;
+        
         if(tempPn == Pn) {
-          answer ++;
-          startIdx++;
+          answer++;
+          tempPn--;
         }
+        i++;
+      
+      } else {
+        
+        tempPn = 0;
       }
-
-      startIdx++;
     }
+    
 
     System.out.println(answer);
   }
