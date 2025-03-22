@@ -137,17 +137,12 @@ public class Main {
     return board;
   }
 
-  /*
-    배열의 이동 및 정렬을 담당하는 메서드
-   */
   private static int[] getResultNumbersFrom(int[] curMoveArr, int boardSize) {
     ArrayList<Integer> blockNumbers = getCalculatedNumbersToRightFrom(curMoveArr);
 
     return getResultMovedNumbersToRight(boardSize, blockNumbers);
   }
-  /*
-    움직이는 방향으로 숫자블럭을 계산하는 메서드
-   */
+  
   private static ArrayList<Integer> getCalculatedNumbersToRightFrom(int[] numberArr) {
 
     Deque<Integer> numberQueue = new ArrayDeque<>();
@@ -183,9 +178,7 @@ public class Main {
     return numberList;
   }
 
-  /*
-    계산한 리스트를 반환 받을 방향에 맞도록 재정렬하는 메서드
-   */
+ 
   private static int[] getResultMovedNumbersToRight(int boardSize, ArrayList<Integer> blockNumbers) {
     int[] resultBlockNumbers = new int[boardSize];
     for(int j = 0; j < blockNumbers.size(); j++) {
@@ -204,11 +197,6 @@ public class Main {
     return resultBlockNumbers;
   }
 
-  /*
-    Board 의 정보를 저장하는 이너 클래스
-    전체 보드 상태 / 이동 횟수 / 보드 내의 최대 숫자
-    -
-   */
   static class Board{
     private int[][] board;
     private int moveCount;
@@ -252,5 +240,5 @@ public class Main {
       }
       return new Board(snapshot, moveCount);
     }
-}
+  }
 }
