@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-  static int max = 0;
+  static int max = 0;   // 재귀 할 때마다 max 를 업데이트 함
 
   public static void main(String[] args) throws IOException {
 
@@ -27,7 +27,7 @@ public class Main {
     br.close();
 
     Board originBoard = Board.generateBoardBy(inputBoardNumber, 0);
-    bruteForce2048(originBoard);
+    bruteForce2048(originBoard); // 재귀 시작
 
     System.out.println(max);
   }
@@ -40,14 +40,14 @@ public class Main {
 
     Board snapshot = board.getSnapshot();
 
-    bruteForce2048(moveRight(snapshot));
-    bruteForce2048(moveDown(snapshot));
-    bruteForce2048(moveLeft(snapshot));
-    bruteForce2048(moveUp(snapshot));
+    bruteForce2048(moveToRight(snapshot));
+    bruteForce2048(moveToDown(snapshot));
+    bruteForce2048(moveToLeft(snapshot));
+    bruteForce2048(moveToUp(snapshot));
   }
 
 
-  private static Board moveRight(Board snapshot) {
+  private static Board moveToRight(Board snapshot) {
 
     int boardSize = snapshot.getBoard().length;
     int[][] board = getCopyOf(snapshot, boardSize);
@@ -60,13 +60,13 @@ public class Main {
         board[row][col] = 0;
       }
 
-      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize, "RIGHT");
+      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize);
       board[row] = Arrays.copyOf(resultBlockNumbers, boardSize);
     }
     return new Board(board, snapshot.getMoveCount() + 1);
   }
 
-  private static Board moveDown(Board snapshot) {
+  private static Board moveToDown(Board snapshot) {
 
     int boardSize = snapshot.getBoard().length;
     int[][] board = getCopyOf(snapshot, boardSize);
@@ -79,7 +79,7 @@ public class Main {
         board[row][col] = 0;
       }
 
-      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize, "RIGHT");
+      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize);
       for(int i = 0; i < boardSize; i++) {
         board[i][col] = resultBlockNumbers[i];
       }
@@ -87,7 +87,7 @@ public class Main {
     return new Board(board, snapshot.getMoveCount() + 1);
   }
 
-  private static Board moveLeft(Board snapshot) {
+  private static Board moveToLeft(Board snapshot) {
 
     int boardSize = snapshot.getBoard().length;
     int[][] board = getCopyOf(snapshot, boardSize);
@@ -100,13 +100,15 @@ public class Main {
         board[row][col] = 0;
       }
 
-      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize, "LEFT");
-      board[row] = Arrays.copyOf(resultBlockNumbers, boardSize);
+      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize);
+      for(int col = boardSize - 1; col >= 0; col--) {
+        board[row][col] = resultBlockNumbers[(boardSize - 1) - col];
+      }
     }
     return new Board(board, snapshot.getMoveCount() + 1);
   }
 
-  private static Board moveUp(Board snapshot) {
+  private static Board moveToUp(Board snapshot) {
 
     int boardSize = snapshot.getBoard().length;
     int[][] board = getCopyOf(snapshot, boardSize);
@@ -119,9 +121,9 @@ public class Main {
         board[row][col] = 0;
       }
 
-      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize, "LEFT");
-      for(int i = 0; i < boardSize; i++) {
-        board[i][col] = resultBlockNumbers[i];
+      int[] resultBlockNumbers = getResultNumbersFrom(curMoveArr, boardSize);
+      for(int row = boardSize - 1; row >= 0; row--) {
+        board[row][col] = resultBlockNumbers[(boardSize - 1) - row];
       }
     }
     return new Board(board, snapshot.getMoveCount() + 1);
@@ -135,35 +137,17 @@ public class Main {
     return board;
   }
 
-  private static int[] getResultNumbersFrom(int[] curMoveArr, int boardSize, String direction) {
+  /*
+    배열의 이동 및 정렬을 담당하는 메서드
+   */
+  private static int[] getResultNumbersFrom(int[] curMoveArr, int boardSize) {
     ArrayList<Integer> blockNumbers = getCalculatedNumbersToRightFrom(curMoveArr);
 
-    if(direction.equals("RIGHT")) {
-        return getResultMovedNumbersToRight(boardSize, blockNumbers);
-    }
-    return getResultMovedNumbersToLeft(boardSize,
-        blockNumbers);
+    return getResultMovedNumbersToRight(boardSize, blockNumbers);
   }
-
-  private static int[] getResultMovedNumbersToRight(int boardSize, ArrayList<Integer> blockNumbers) {
-    int[] resultBlockNumbers = new int[boardSize];
-    for(int j = 0; j < blockNumbers.size(); j++) {
-      int index = boardSize - blockNumbers.size() + j;
-      resultBlockNumbers[index] = blockNumbers.get(j);
-    }
-    return resultBlockNumbers;
-  }
-
-  private static int[] getResultMovedNumbersToLeft(int boardSize, ArrayList<Integer> blockNumbers) {
-    int[] resultBlockNumbers = new int[boardSize];
-    for(int j = 0; j < blockNumbers.size(); j++) {
-      int index = (blockNumbers.size() - 1) - j;
-      resultBlockNumbers[j] = blockNumbers.get(index);
-    }
-    return resultBlockNumbers;
-  }
-
-
+  /*
+    움직이는 방향으로 숫자블럭을 계산하는 메서드
+   */
   private static ArrayList<Integer> getCalculatedNumbersToRightFrom(int[] numberArr) {
 
     Deque<Integer> numberQueue = new ArrayDeque<>();
@@ -199,6 +183,32 @@ public class Main {
     return numberList;
   }
 
+  /*
+    계산한 리스트를 반환 받을 방향에 맞도록 재정렬하는 메서드
+   */
+  private static int[] getResultMovedNumbersToRight(int boardSize, ArrayList<Integer> blockNumbers) {
+    int[] resultBlockNumbers = new int[boardSize];
+    for(int j = 0; j < blockNumbers.size(); j++) {
+      int index = boardSize - blockNumbers.size() + j;
+      resultBlockNumbers[index] = blockNumbers.get(j);
+    }
+    return resultBlockNumbers;
+  }
+
+  private static int[] getResultMovedNumbersToLeft(int boardSize, ArrayList<Integer> blockNumbers) {
+    int[] resultBlockNumbers = new int[boardSize];
+    for(int j = 0; j < blockNumbers.size(); j++) {
+      int index = (blockNumbers.size() - 1) - j;
+      resultBlockNumbers[j] = blockNumbers.get(index);
+    }
+    return resultBlockNumbers;
+  }
+
+  /*
+    Board 의 정보를 저장하는 이너 클래스
+    전체 보드 상태 / 이동 횟수 / 보드 내의 최대 숫자
+    -
+   */
   static class Board{
     private int[][] board;
     private int moveCount;
@@ -208,18 +218,6 @@ public class Main {
       this.board = inputBoardNumber;
       this.moveCount = count;
       this.max = calculateMaxOf(inputBoardNumber);
-    }
-
-    public int[][] getBoard() {
-      return board;
-    }
-
-    public int getMoveCount() {
-      return moveCount;
-    }
-
-    public int getMax() {
-      return max;
     }
 
     private int calculateMaxOf(int[][] inputBoardNumber) {
@@ -237,6 +235,12 @@ public class Main {
       return new Board(inputBoardNumber, count);
     }
 
+    public int[][] getBoard() {return board;}
+
+    public int getMoveCount() {return moveCount;}
+
+    public int getMax() {return max;}
+
     public boolean isCountMoreThanFive(){
       return moveCount >= 5;
     }
@@ -248,20 +252,5 @@ public class Main {
       }
       return new Board(snapshot, moveCount);
     }
-
-    public void print() {
-
-      System.out.println("[ count : " + moveCount + " ] ==========================");
-
-      for(int i = 0; i < board.length; i++) {
-        for(int j = 0; j < board.length; j++) {
-          System.out.print(board[i][j] + " ");
-        }
-        System.out.println();
-      }
-
-      System.out.println("max = " + max);
-    }
-  }
-
+}
 }
