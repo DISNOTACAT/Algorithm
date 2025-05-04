@@ -41,32 +41,32 @@ public class Main {
     int[] colors = new int[graph.size()];
     boolean[] visited = new boolean[graph.size()];
 
-    for (int start = 1; start < graph.size(); start++) {
-        if (visited[start]) continue;
-
-        Deque<Integer> que = new ArrayDeque<>();
-        que.add(start);
-        colors[start] = 1;
-
-        while (!que.isEmpty()) {
-            int node = que.pollFirst();
-            visited[node] = true;
-
-            for (Integer neighbor : graph.get(node)) {
-                if (colors[neighbor] != 0) {
-                    if (colors[neighbor] == colors[node]) {
-                        return "NO";
-                    }
-                    continue;
-                }
-
-                colors[neighbor] = (colors[node] == 1 ? 2 : 1);
-                que.addLast(neighbor); // BFS
-            }
+    for (int i = 1; i < graph.size(); i++) {
+        if (!visited[i]) {
+            boolean result = dfs(i, 1, visited, colors, graph);
+            if (!result) return "NO";
         }
     }
 
     return "YES";
 }
+
+private static boolean dfs(int node, int color, boolean[] visited, int[] colors, ArrayList<ArrayList<Integer>> graph) {
+    visited[node] = true;
+    colors[node] = color;
+
+    for (int neighbor : graph.get(node)) {
+        if (!visited[neighbor]) {
+            if (!dfs(neighbor, 3 - color, visited, colors, graph)) {
+                return false;
+            }
+        } else if (colors[neighbor] == colors[node]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 }
