@@ -5,29 +5,25 @@ import java.io.InputStreamReader;
 public class Main {
 
   public static void main(String[] args) throws IOException {
-
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    String[] str = br.readLine().split("");
+    String str = br.readLine();
 
+    int len = str.length();
 
-    int i = 0;
-    while(i < str.length) {
-      int temp = i;
-      for(int j = str.length-1; j >= i; j--) {
-
-        if(j <= temp) {
-          System.out.println(str.length + i);
-          return;
-        }
-
-        if(!str[temp].equals(str[j])) break;
-
-        temp++;
+    for (int i = 0; i < len; i++) {
+      String sub = str.substring(i);
+      if (isPalindrome(sub)) {
+        System.out.println(len + i);
+        return;
       }
-      i++;
     }
-
-    System.out.println(str.length + i);
   }
 
+  private static boolean isPalindrome(String s) {
+    int l = 0, r = s.length() - 1;
+    while (l < r) {
+      if (s.charAt(l++) != s.charAt(r--)) return false;
+    }
+    return true;
+  }
 }
